@@ -17,10 +17,29 @@ var initialized = false;
 var options = {};
 var profileName = '';
 
-Pebble.addEventListener("ready", function() {
-  console.log("ready called!");
-  initialized = true;
-});
+var id;
+
+var locationOptions = {
+  enableHighAccuracy: true, 
+  maximumAge: 0, 
+  timeout: 5000
+};
+
+function locationSuccess(pos) {
+  console.log('Location changed!');
+  console.log('lat= ' + pos.coords.latitude + ' lon= ' + pos.coords.longitude);
+}
+
+function locationError(err) {
+  console.log('location error (' + err.code + '): ' + err.message);
+}
+
+Pebble.addEventListener('ready',
+  function(e) {
+    // Get location updates
+    id = navigator.geolocation.watchPosition(locationSuccess, locationError, locationOptions);
+  }
+);
 
 
 Pebble.addEventListener('showConfiguration', function(e) {
@@ -91,7 +110,6 @@ function showMenu() {
         // Push the user's token
         var token = Pebble.getAccountToken();
         ref.child('users/' + token + '/name/').set(profileName);
-        ref.child('users/second/name').set("token2");
         break;
       case "Delete data":
         // ... or remove all the data at the location
@@ -154,3 +172,4 @@ function showData() {
 
 // Make sure we show our main menu
 showMenu();
+
