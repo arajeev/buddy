@@ -1,0 +1,26 @@
+{
+    "appKeys": {
+        "GREETING": 0,
+        "TITLE": 1
+    },
+    "capabilities": [
+        ""
+    ],
+    "companyName": "s274lee@uwaterloo.ca",
+    "longName": "Buddy",
+    "projectType": "native",
+    "resources": {
+        "media": []
+    },
+    "sdkVersion": "3",
+    "shortName": "Buddy",
+    "targetPlatforms": [
+        "aplite",
+        "basalt"
+    ],
+    "uuid": "74cbdf47-a608-4a51-99bf-90d4fdd5614d",
+    "versionLabel": "1.0",
+    "watchapp": {
+        "watchface": false
+    }
+}
