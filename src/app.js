@@ -13,6 +13,33 @@ Firebase.INTERNAL.forceWebSockets();
 */
 var ref = new Firebase("https://brilliant-inferno-5787.firebaseio.com/");
 
+var initialized = false;
+var options = {};
+
+Pebble.addEventListener("ready", function() {
+  console.log("ready called!");
+  initialized = true;
+});
+
+
+Pebble.addEventListener('showConfiguration', function(e) {
+  // Show config page
+  Pebble.openURL('https://shining-inferno-5807.firebaseapp.com/');
+  console.log('opened URL');
+});
+
+Pebble.addEventListener("webviewclosed", function(e) {
+  console.log("configuration closed");
+  // webview closed
+  //Using primitive JSON validity and non-empty check
+  if (e.response.charAt(0) == "{" && e.response.slice(-1) == "}" && e.response.length > 5) {
+    options = JSON.parse(decodeURIComponent(e.response));
+    console.log("Options = " + JSON.stringify(options));
+  } else {
+    console.log("Cancelled");
+  }
+});
+
 function showMenu() {
   // We create a simple menu with a few options
   var menu = new UI.Menu({

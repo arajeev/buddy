@@ -1,10 +1,11 @@
 {
     "appKeys": {},
     "capabilities": [
-        ""
+        "location",
+        "configurable"
     ],
     "companyName": "ranagha13@gmail.com",
-    "longName": "HelloWorldJS",
+    "longName": "PetPebble",
     "projectType": "pebblejs",
     "resources": {
         "media": [
@@ -32,7 +33,7 @@
         ]
     },
     "sdkVersion": "3",
-    "shortName": "HelloWorldJS",
+    "shortName": "PetPebble",
     "uuid": "22795e77-d768-47b5-8b59-272fd939ff14",
     "versionCode": 1,
     "versionLabel": "1.0",
