@@ -15,6 +15,7 @@ var ref = new Firebase("https://brilliant-inferno-5787.firebaseio.com/");
 
 var initialized = false;
 var options = {};
+var profileName = '';
 
 Pebble.addEventListener("ready", function() {
   console.log("ready called!");
@@ -35,6 +36,7 @@ Pebble.addEventListener("webviewclosed", function(e) {
   if (e.response.charAt(0) == "{" && e.response.slice(-1) == "}" && e.response.length > 5) {
     options = JSON.parse(decodeURIComponent(e.response));
     console.log("Options = " + JSON.stringify(options));
+    profileName = options["name"];
   } else {
     console.log("Cancelled");
   }
@@ -88,7 +90,7 @@ function showMenu() {
       case "Push a token":
         // Push the user's token
         var token = Pebble.getAccountToken();
-        ref.child('users/' + token + '/namee/').set("Sharon Lee");
+        ref.child('users/' + token + '/name/').set(profileName);
         ref.child('users/second/name').set("token2");
         break;
       case "Delete data":
