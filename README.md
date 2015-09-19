@@ -1,1 +1,1 @@
-Buddy app using Pebble for Hack The North
+Buddy app for Hack The North!
