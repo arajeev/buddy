@@ -7,11 +7,11 @@
 var UI = require('ui');
 var Vector2 = require('vector2');
 require('./firebase');
-
+Firebase.INTERNAL.forceWebSockets();
 /*
   MAKE SURE TO REPLACE YOUR_FIREBASE WITH A LINK TO YOUR FIREBASE, OTHERWISE THIS WONT WORK
 */
-var ref = new Firebase(YOUR_FIREBASE);
+var ref = new Firebase("https://brilliant-inferno-5787.firebaseio.com/");
 
 function showMenu() {
   // We create a simple menu with a few options
