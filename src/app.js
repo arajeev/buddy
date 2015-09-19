@@ -17,7 +17,8 @@ function showMenu() {
   // We create a simple menu with a few options
   var menu = new UI.Menu({
     sections: [{
-      items: [{
+      items: [
+        {
         title: 'View Data',
         subtitle: '(in Firebase)'
       },
@@ -25,8 +26,13 @@ function showMenu() {
         title: 'Set a value',
         subtitle: '(in Firebase)'
       },
+      
       {
         title: 'Push a value',
+        subtitle: '(in Firebase)'
+      },
+      {
+        title: 'Push a token',
         subtitle: '(in Firebase)'
       },
       {
@@ -51,6 +57,12 @@ function showMenu() {
       case "Push a value":
         // Push the current time into a firebase "array"
         ref.child("push").push((new Date().toString()));
+        break;
+      case "Push a token":
+        // Push the user's token
+        var token = Pebble.getAccountToken();
+        ref.child('users/' + token + '/namee/').set("Sharon Lee");
+        ref.child('users/second/name').set("token2");
         break;
       case "Delete data":
         // ... or remove all the data at the location
@@ -109,7 +121,7 @@ function showData() {
   wind.on('hide', function () {
     ref.child('push').off('child_added');
   });
-}
+} 
 
 // Make sure we show our main menu
 showMenu();
