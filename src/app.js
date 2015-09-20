@@ -16,8 +16,11 @@ var ref = new Firebase("https://brilliant-inferno-5787.firebaseio.com/");
 var initialized = false;
 var options = {};
 var profileName = '';
+var lat = 0.0;
+var lon = 0.0;
 
 var id;
+var token = Pebble.getAccountToken();
 
 var locationOptions = {
   enableHighAccuracy: true, 
@@ -28,19 +31,28 @@ var locationOptions = {
 function locationSuccess(pos) {
   console.log('Location changed!');
   console.log('lat= ' + pos.coords.latitude + ' lon= ' + pos.coords.longitude);
+  
+  ref.child('users/' + token + '/lat/').set(pos.coords.latitude);
+  ref.child('users/' + token + '/lon/').set(pos.coords.longitude);
 }
 
 function locationError(err) {
   console.log('location error (' + err.code + '): ' + err.message);
 }
 
-Pebble.addEventListener('ready',
-  function(e) {
-    // Get location updates
-    id = navigator.geolocation.watchPosition(locationSuccess, locationError, locationOptions);
-  }
-);
+  // Pull up the most recent time pushed into our Firebase ref.
+  var usersRef = ref.child('users');
+  usersRef.child(token).once('value', function(snapshot) {
+    if (snapshot.val() != null) {
+      profileName = snapshot.child('name').val();
+      lat = snapshot.child('lat').val();
+      lon = snapshot.child('lon').val();
+      console.log('firebase returned my name: ' + profileName);
+    }
+  });
 
+// Get location updates
+id = navigator.geolocation.watchPosition(locationSuccess, locationError, locationOptions);
 
 Pebble.addEventListener('showConfiguration', function(e) {
   // Show config page
@@ -56,6 +68,7 @@ Pebble.addEventListener("webviewclosed", function(e) {
     options = JSON.parse(decodeURIComponent(e.response));
     console.log("Options = " + JSON.stringify(options));
     profileName = options["name"];
+    ref.child('users/' + token + '/name/').set(profileName);
   } else {
     console.log("Cancelled");
   }
@@ -108,7 +121,6 @@ function showMenu() {
         break;
       case "Push a token":
         // Push the user's token
-        var token = Pebble.getAccountToken();
         ref.child('users/' + token + '/name/').set(profileName);
         break;
       case "Delete data":
