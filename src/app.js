@@ -45,17 +45,46 @@ function locationSuccess(pos) {
   
   ref.child('users/' + token + '/lat/').set(pos.coords.latitude);
   ref.child('users/' + token + '/lon/').set(pos.coords.longitude);
+  lat = pos.coords.latitude;
+  lon = pos.coords.longitude;
   
-  ref.child('users').orderByKey().on("value", function(snapshot) {
-    console.log(snapshot.key());
-    /*
-    if (snapshot.val() != null) {
+  ref.child('users').once("value", function(snapshot) {
+    var matched = false;
+    snapshot.forEach(function(data) {
       
-      profileName = snapshot.child('name').val();
-      lat = snapshot.child('lat').val();
-      lon = snapshot.child('lon').val();
-      console.log('firebase returned my name: ' + profileName);
-    */
+      if (data.key() != token) {
+        matched = true;
+        otherName = data.child('name').val();
+        otherLat = data.child('lat').val();
+        otherLon = data.child('lon').val();
+        
+        var latdiff = 0.0;
+        var londiff = 0.0;
+        if (otherLat > lat) {
+          latdiff = otherLat - lat;
+        } else {
+          latdiff = lat - otherLat;
+        }
+        
+        if (otherLon > lon) {
+          londiff = otherLon - lon;
+        } else {
+          londiff = lon - otherLon;
+        }
+        
+        if ((latdiff + londiff < 0.001) && (otherName != null) ) {
+          // We are close enough to announce the other person
+          card.title('You found ' + otherName);
+          card.subtitle('');
+          card.banner('images/super_happy.png');
+        }
+      }
+    });
+    if (!matched) {
+      card.title('Nobody');
+      card.subtitle('nearby...');
+      card.banner('images/happy_s.png');
+      }
   });
 }
 
@@ -74,13 +103,13 @@ function locationError(err) {
     }
   });
 
-if (id == null) {
+//if (id == null) {
   // Get location updates
   id = navigator.geolocation.watchPosition(locationSuccess, locationError, locationOptions);
-} else {
+//} else {
   // Clear the watch and stop receiving updates
   //navigator.geolocation.clearWatch(id);
-}
+//}
 
 Pebble.addEventListener('showConfiguration', function(e) {
   // Show config page
