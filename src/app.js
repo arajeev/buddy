@@ -12,7 +12,7 @@ Firebase.INTERNAL.forceWebSockets();
   MAKE SURE TO REPLACE YOUR_FIREBASE WITH A LINK TO YOUR FIREBASE, OTHERWISE THIS WONT WORK
 */
 var ref = new Firebase("https://brilliant-inferno-5787.firebaseio.com/");
-
+var posIsUp = true;
 //var initialized = false;
 var options = {};
 var profileName = '';
@@ -27,7 +27,7 @@ var token = Pebble.getAccountToken();
 var card = new UI.Card({
   title:'Nobody',
   subtitle:'nearby...',
-  banner:'images/happy_s.png'
+  banner:'images/happy_s_crop_up.png'
 });
 card.on('click', 'select', function() {});
 
@@ -42,7 +42,7 @@ var secondCard = new UI.Card({
 var thirdCard = new UI.Card({
   title:'',
   subtitle:'',
-  banner:'images/happy_s_crop_up.png'
+  banner:'images/happy_s.png'
 });
 
 // Create bools for which card to display
@@ -133,7 +133,15 @@ function locationSuccess(pos) {
       thirdCard.hide();
       nameShow = true;
       statusShow = !nameShow;
+      if(posIsUp) {
+        card.banner('images/happy_s_crop_down.png');
+        posIsUp = false;
       }
+      else {
+        card.banner('images/happy_s_crop_up.png');
+        posIsUp = true;
+      }
+    }
     console.log('matched is: ' + matched);
   });
 }
