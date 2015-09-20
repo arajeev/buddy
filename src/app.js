@@ -42,7 +42,7 @@ var secondCard = new UI.Card({
 var thirdCard = new UI.Card({
   title:'',
   subtitle:'',
-  banner:'images/happy_s.png'
+  banner:'images/happy_s_crop_up.png'
 });
 
 // Create bools for which card to display
@@ -171,7 +171,7 @@ Pebble.addEventListener("webviewclosed", function(e) {
     profileName = options.name;
     status = options.status;
     ref.child('users/' + token + '/name/').set(profileName);
-        ref.child('users/' + token + '/status/').set(profileName);
+        ref.child('users/' + token + '/status/').set(status);
   } else {
     console.log("Cancelled");
   }

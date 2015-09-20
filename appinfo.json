@@ -31,6 +31,11 @@
                 "type": "font"
             },
             {
+                "file": "images/happy_s_crop_up.png",
+                "name": "IMAGES_HAPPY_S_CROP_UP_PNG",
+                "type": "png"
+            },
+            {
                 "file": "images/super_happy.png",
                 "name": "IMAGES_SUPER_HAPPY_PNG",
                 "type": "png"
