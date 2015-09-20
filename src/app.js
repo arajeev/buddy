@@ -71,7 +71,6 @@ function locationSuccess(pos) {
     snapshot.forEach(function(data) {
       
       if (data.key() != token) {
-        matched = true;
         var otherName = data.child('name').val();
         var otherStatus = data.child('status').val();
         var otherLat = data.child('lat').val();
@@ -96,11 +95,13 @@ function locationSuccess(pos) {
         
         if ((latdiff + londiff < 0.0001) && (otherName != null)) {
           // We are close enough to announce the other person
+          matched = true;
           if (cardShow) {
             card.title('You found ' + otherName);
             card.subtitle('');
             card.banner('images/super_happy.png');
             card.on('click', 'select', function(e) {
+              console.log('select clicked!');
               if (otherStatus != null) {
                 secondCard.title(otherStatus);
                 secondCard.subtitle('');
@@ -115,6 +116,7 @@ function locationSuccess(pos) {
             secondCard.title(otherStatus);
             secondCard.banner('images/happy_s.png');
             secondCard.on('click', 'back', function(e) {
+              console.log('back clicked!');
               if (otherName != null) {
                 card.title('You found ' + otherName);
                 card.banner('images/super_happy.png');
