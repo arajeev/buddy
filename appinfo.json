@@ -29,6 +29,11 @@
                 "file": "fonts/UbuntuMono-Regular.ttf",
                 "name": "MONO_FONT_14",
                 "type": "font"
+            },
+            {
+                "file": "images/happy_s.png",
+                "name": "IMAGES_HAPPY_S_PNG",
+                "type": "png"
             }
         ]
     },

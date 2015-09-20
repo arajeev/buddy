@@ -19,8 +19,19 @@ var profileName = '';
 var lat = 0.0;
 var lon = 0.0;
 
-var id;
+var id = null;
 var token = Pebble.getAccountToken();
+
+// Create a Card with title and subtitle
+var card = new UI.Card({
+  title:'Nobody',
+  subtitle:'nearby...'
+});
+
+card.banner("images/happy_s.png");
+
+// Display the Card
+card.show();
 
 var locationOptions = {
   enableHighAccuracy: true, 
@@ -34,6 +45,18 @@ function locationSuccess(pos) {
   
   ref.child('users/' + token + '/lat/').set(pos.coords.latitude);
   ref.child('users/' + token + '/lon/').set(pos.coords.longitude);
+  
+  ref.child('users').orderByKey().on("value", function(snapshot) {
+    console.log(snapshot.key());
+    /*
+    if (snapshot.val() != null) {
+      
+      profileName = snapshot.child('name').val();
+      lat = snapshot.child('lat').val();
+      lon = snapshot.child('lon').val();
+      console.log('firebase returned my name: ' + profileName);
+    */
+  });
 }
 
 function locationError(err) {
@@ -51,8 +74,13 @@ function locationError(err) {
     }
   });
 
-// Get location updates
-id = navigator.geolocation.watchPosition(locationSuccess, locationError, locationOptions);
+if (id == null) {
+  // Get location updates
+  id = navigator.geolocation.watchPosition(locationSuccess, locationError, locationOptions);
+} else {
+  // Clear the watch and stop receiving updates
+  //navigator.geolocation.clearWatch(id);
+}
 
 Pebble.addEventListener('showConfiguration', function(e) {
   // Show config page
@@ -74,6 +102,7 @@ Pebble.addEventListener("webviewclosed", function(e) {
   }
 });
 
+/*
 function showMenu() {
   // We create a simple menu with a few options
   var menu = new UI.Menu({
@@ -162,10 +191,6 @@ function showData() {
     wind.show();
   });
 
-  /*
-    We use a once event to determine if location exists
-    i.e. has any data been written
-  */
   recentPushRef.once('value', function (snapshot) {
     if (!snapshot.exists())
       textfield.text("No data, yet!");
@@ -173,10 +198,7 @@ function showData() {
     wind.show();
   });
 
-  /*
-  Make sure we're only getting updates from
-  Firebase when the card is displayed, so we .off when the window hides
-  */
+
   wind.on('hide', function () {
     ref.child('push').off('child_added');
   });
@@ -184,4 +206,4 @@ function showData() {
 
 // Make sure we show our main menu
 showMenu();
-
+*/
