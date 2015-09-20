@@ -16,6 +16,7 @@ var ref = new Firebase("https://brilliant-inferno-5787.firebaseio.com/");
 var initialized = false;
 var options = {};
 var profileName = '';
+var status = '';
 var lat = 0.0;
 var lon = 0.0;
 
@@ -28,10 +29,27 @@ var card = new UI.Card({
   subtitle:'nearby...'
 });
 
+// Create a card for the second view
+var secondCard = new UI.Card({
+  title:'Status',
+  subtitle:''
+});
+
+// Create bools for which card to display
+var cardShow = true;
+var secondCardShow = !cardShow;
+
 card.banner("images/happy_s.png");
 
 // Display the Card
-card.show();
+if (cardShow) {
+  card.show();
+  secondCard.hide();
+} else {
+  secondCard.show();
+  card.hide();
+}
+        
 
 var locationOptions = {
   enableHighAccuracy: true, 
@@ -54,9 +72,10 @@ function locationSuccess(pos) {
       
       if (data.key() != token) {
         matched = true;
-        otherName = data.child('name').val();
-        otherLat = data.child('lat').val();
-        otherLon = data.child('lon').val();
+        var otherName = data.child('name').val();
+        var otherStatus = data.child('status').val();
+        var otherLat = data.child('lat').val();
+        var otherLon = data.child('lon').val();
         
         var latdiff = 0.0;
         var londiff = 0.0;
@@ -72,11 +91,40 @@ function locationSuccess(pos) {
           londiff = lon - otherLon;
         }
         
-        if ((latdiff + londiff < 0.001) && (otherName != null) ) {
+          console.log('londiff: ' + londiff);
+          console.log('latdiff: ' + latdiff);
+        
+        if ((latdiff + londiff < 0.0001) && (otherName != null)) {
           // We are close enough to announce the other person
-          card.title('You found ' + otherName);
-          card.subtitle('');
-          card.banner('images/super_happy.png');
+          if (cardShow) {
+            card.title('You found ' + otherName);
+            card.subtitle('');
+            card.banner('images/super_happy.png');
+            card.on('click', 'select', function(e) {
+              if (otherStatus != null) {
+                secondCard.title(otherStatus);
+                secondCard.subtitle('');
+                secondCard.banner('images/happy_s.png');
+                secondCardShow = true;
+                cardShow = !secondCardShow;
+                secondCard.show();
+                card.hide();
+              }
+            });
+          } else {
+            secondCard.title(otherStatus);
+            secondCard.banner('images/happy_s.png');
+            secondCard.on('click', 'back', function(e) {
+              if (otherName != null) {
+                card.title('You found ' + otherName);
+                card.banner('images/super_happy.png');
+                cardShow = true;
+                secondCardShow = !cardShow;
+                card.show();
+                secondCard.hide();
+              }
+            });
+          }
         }
       }
     });
@@ -84,7 +132,12 @@ function locationSuccess(pos) {
       card.title('Nobody');
       card.subtitle('nearby...');
       card.banner('images/happy_s.png');
+      card.show();
+      cardShow = true;
+      secondCard.hide();
+      secondCardShow = !cardShow;
       }
+    console.log('matched is: ' + matched)
   });
 }
 
@@ -103,13 +156,7 @@ function locationError(err) {
     }
   });
 
-//if (id == null) {
-  // Get location updates
-  id = navigator.geolocation.watchPosition(locationSuccess, locationError, locationOptions);
-//} else {
-  // Clear the watch and stop receiving updates
-  //navigator.geolocation.clearWatch(id);
-//}
+id = navigator.geolocation.watchPosition(locationSuccess, locationError, locationOptions);
 
 Pebble.addEventListener('showConfiguration', function(e) {
   // Show config page
@@ -125,114 +172,10 @@ Pebble.addEventListener("webviewclosed", function(e) {
     options = JSON.parse(decodeURIComponent(e.response));
     console.log("Options = " + JSON.stringify(options));
     profileName = options["name"];
+    status = options["status"];
     ref.child('users/' + token + '/name/').set(profileName);
+        ref.child('users/' + token + '/status/').set(profileName);
   } else {
     console.log("Cancelled");
   }
 });
-
-/*
-function showMenu() {
-  // We create a simple menu with a few options
-  var menu = new UI.Menu({
-    sections: [{
-      items: [
-        {
-        title: 'View Data',
-        subtitle: '(in Firebase)'
-      },
-      {
-        title: 'Set a value',
-        subtitle: '(in Firebase)'
-      },
-      
-      {
-        title: 'Push a value',
-        subtitle: '(in Firebase)'
-      },
-      {
-        title: 'Push a token',
-        subtitle: '(in Firebase)'
-      },
-      {
-        title: 'Delete data',
-        subtitle: '(in Firebase)'
-      }]
-    }]
-  });
-
-  // When the user selects an option...
-  menu.on('select', function(e) {
-    // We use the title to perform operations
-    switch (e.item.title) {
-      case "View Data":
-        // Show the data view window
-        showData();
-        break;
-      case "Set a value":
-        // Set a location in Firebase
-        ref.child('set/value').set(true);
-        break;
-      case "Push a value":
-        // Push the current time into a firebase "array"
-        ref.child("push").push((new Date().toString()));
-        break;
-      case "Push a token":
-        // Push the user's token
-        ref.child('users/' + token + '/name/').set(profileName);
-        break;
-      case "Delete data":
-        // ... or remove all the data at the location
-        ref.remove();
-        break;
-    }
-  });
-
-  // Finally make sure the menu is set to show.
-  menu.show();
-}
-
-function showData() {
-  // Create a new Pebble window
-  var wind = new UI.Window();
-
-  // Then create a textfield which will be updated by Firebase.
-  var textfield = new UI.Text({
-    position: new Vector2(0, 50),
-    size: new Vector2(144, 30),
-    font: 'gothic-24-bold',
-    text: "Loading...",
-    textAlign: 'center'
-  });
-
-  // Add the textfield to our window object
-  wind.add(textfield);
-
-  // Create a new Firebase ref which points to the last child of /push
-  var recentPushRef = ref
-      .child('push')
-      .limitToLast(1);
-
-  // Pull up the most recent time pushed into our Firebase ref.
-  recentPushRef.on('child_added', function (datetime) {
-    var text = datetime.val();
-    textfield.text(text);
-    wind.show();
-  });
-
-  recentPushRef.once('value', function (snapshot) {
-    if (!snapshot.exists())
-      textfield.text("No data, yet!");
-
-    wind.show();
-  });
-
-
-  wind.on('hide', function () {
-    ref.child('push').off('child_added');
-  });
-} 
-
-// Make sure we show our main menu
-showMenu();
-*/
