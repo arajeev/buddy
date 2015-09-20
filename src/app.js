@@ -5,7 +5,7 @@
  */
 
 var UI = require('ui');
-var Vector2 = require('vector2');
+//var Vector2 = require('vector2');
 require('./firebase');
 Firebase.INTERNAL.forceWebSockets();
 /*
@@ -13,7 +13,7 @@ Firebase.INTERNAL.forceWebSockets();
 */
 var ref = new Firebase("https://brilliant-inferno-5787.firebaseio.com/");
 
-var initialized = false;
+//var initialized = false;
 var options = {};
 var profileName = '';
 var status = '';
@@ -93,7 +93,7 @@ function locationSuccess(pos) {
           console.log('londiff: ' + londiff);
           console.log('latdiff: ' + latdiff);
         
-        if ((latdiff + londiff < 0.0001) && (otherName != null)) {
+        if ((latdiff + londiff < 0.0001) && (otherName !== null)) {
           // We are close enough to announce the other person
           matched = true;
           if (cardShow) {
@@ -102,7 +102,7 @@ function locationSuccess(pos) {
             card.banner('images/super_happy.png');
             card.on('click', 'select', function(e) {
               console.log('select clicked!');
-              if (otherStatus != null) {
+              if (card.title !== 'Nobody' && otherStatus !== null) {
                 secondCard.title(otherStatus);
                 secondCard.subtitle('');
                 secondCard.banner('images/happy_s.png');
@@ -117,7 +117,7 @@ function locationSuccess(pos) {
             secondCard.banner('images/happy_s.png');
             secondCard.on('click', 'back', function(e) {
               console.log('back clicked!');
-              if (otherName != null) {
+              if (card.title !== 'Nobody' && otherName !== null) {
                 card.title('You found ' + otherName);
                 card.banner('images/super_happy.png');
                 cardShow = true;
@@ -139,7 +139,7 @@ function locationSuccess(pos) {
       secondCard.hide();
       secondCardShow = !cardShow;
       }
-    console.log('matched is: ' + matched)
+    console.log('matched is: ' + matched);
   });
 }
 
@@ -150,7 +150,7 @@ function locationError(err) {
   // Pull up the most recent time pushed into our Firebase ref.
   var usersRef = ref.child('users');
   usersRef.child(token).once('value', function(snapshot) {
-    if (snapshot.val() != null) {
+    if (snapshot.val() !== null) {
       profileName = snapshot.child('name').val();
       lat = snapshot.child('lat').val();
       lon = snapshot.child('lon').val();
