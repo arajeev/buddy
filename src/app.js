@@ -12,7 +12,9 @@ Firebase.INTERNAL.forceWebSockets();
   MAKE SURE TO REPLACE YOUR_FIREBASE WITH A LINK TO YOUR FIREBASE, OTHERWISE THIS WONT WORK
 */
 var ref = new Firebase("https://brilliant-inferno-5787.firebaseio.com/");
-var posIsUp = true;
+var happyPosIsUp = true;
+var superHappyPosUp = true;
+
 //var initialized = false;
 var options = {};
 var profileName = '';
@@ -35,7 +37,7 @@ card.on('click', 'select', function() {});
 var secondCard = new UI.Card({
   title:'You found ',
   subtitle:'',
-  banner:'images/super_happy.png'
+  banner:'images/super_happy_crop_up.png'
 });
 
 // Create a card for the status view
@@ -98,6 +100,14 @@ function locationSuccess(pos) {
           if (nameShow) {
             secondCard.title('You found ' + otherName);
             secondCard.subtitle('');
+            if(superHappyPosUp) {
+              secondCard.banner('images\super_happy_crop_up.png');
+              superHappyPosUp = false;
+            }
+            else {
+              secondCard.banner('images\super_happy_crop_down.png');
+              superHappyPosUp = true;
+            }
             secondCard.on('click', 'select', function(e) {
               if (otherStatus !== null) {
                 thirdCard.title(otherStatus);
@@ -133,13 +143,13 @@ function locationSuccess(pos) {
       thirdCard.hide();
       nameShow = true;
       statusShow = !nameShow;
-      if(posIsUp) {
+      if(happyPosIsUp) {
         card.banner('images/happy_s_crop_down.png');
-        posIsUp = false;
+        happyPosIsUp = false;
       }
       else {
         card.banner('images/happy_s_crop_up.png');
-        posIsUp = true;
+        happyPosIsUp = true;
       }
     }
     console.log('matched is: ' + matched);
