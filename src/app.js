@@ -26,30 +26,28 @@ var token = Pebble.getAccountToken();
 // Create a Card with title and subtitle
 var card = new UI.Card({
   title:'Nobody',
-  subtitle:'nearby...'
+  subtitle:'nearby...',
+  banner:'images/happy_s.png'
+});
+card.on('click', 'select', function() {});
+
+// Create a card for the name view
+var secondCard = new UI.Card({
+  title:'You found ',
+  subtitle:'',
+  banner:'images/super_happy.png'
 });
 
-// Create a card for the second view
-var secondCard = new UI.Card({
-  title:'Status',
-  subtitle:''
+// Create a card for the status view
+var thirdCard = new UI.Card({
+  title:'',
+  subtitle:'',
+  banner:'images/happy_s.png'
 });
 
 // Create bools for which card to display
-var cardShow = true;
-var secondCardShow = !cardShow;
-
-card.banner("images/happy_s.png");
-
-// Display the Card
-if (cardShow) {
-  card.show();
-  secondCard.hide();
-} else {
-  secondCard.show();
-  card.hide();
-}
-        
+var nameShow = true;
+var statusShow = false;    
 
 var locationOptions = {
   enableHighAccuracy: true, 
@@ -90,54 +88,51 @@ function locationSuccess(pos) {
           londiff = lon - otherLon;
         }
         
-          console.log('londiff: ' + londiff);
-          console.log('latdiff: ' + latdiff);
+        console.log('londiff: ' + londiff);
+        console.log('latdiff: ' + latdiff);
         
         if ((latdiff + londiff < 0.0001) && (otherName !== null)) {
           // We are close enough to announce the other person
           matched = true;
-          if (cardShow) {
-            card.title('You found ' + otherName);
-            card.subtitle('');
-            card.banner('images/super_happy.png');
-            card.on('click', 'select', function(e) {
-              console.log('select clicked!');
-              if (card.title !== 'Nobody' && otherStatus !== null) {
-                secondCard.title(otherStatus);
-                secondCard.subtitle('');
-                secondCard.banner('images/happy_s.png');
-                secondCardShow = true;
-                cardShow = !secondCardShow;
-                secondCard.show();
-                card.hide();
-              }
-            });
-          } else {
-            secondCard.title(otherStatus);
-            secondCard.banner('images/happy_s.png');
-            secondCard.on('click', 'back', function(e) {
-              console.log('back clicked!');
-              if (card.title !== 'Nobody' && otherName !== null) {
-                card.title('You found ' + otherName);
-                card.banner('images/super_happy.png');
-                cardShow = true;
-                secondCardShow = !cardShow;
-                card.show();
+          card.hide();
+          if (nameShow) {
+            secondCard.title('You found ' + otherName);
+            secondCard.subtitle('');
+            secondCard.on('click', 'select', function(e) {
+              if (otherStatus !== null) {
+                thirdCard.title(otherStatus);
+                thirdCard.subtitle('');
+                statusShow = true;
+                nameShow = !statusShow;
+                thirdCard.show();
                 secondCard.hide();
               }
             });
+            secondCard.show();
+            thirdCard.hide();
+          } else {
+            thirdCard.title(otherStatus);
+            thirdCard.on('click', 'back', function(e) {
+              if (otherName !== null) {
+                secondCard.title('You found ' + otherName);
+                nameShow = true;
+                statusShow = !nameShow;
+                secondCard.show();
+                thirdCard.hide();
+              }
+            });
+            thirdCard.show();
+            secondCard.hide();
           }
         }
       }
     });
     if (!matched) {
-      card.title('Nobody');
-      card.subtitle('nearby...');
-      card.banner('images/happy_s.png');
       card.show();
-      cardShow = true;
       secondCard.hide();
-      secondCardShow = !cardShow;
+      thirdCard.hide();
+      nameShow = true;
+      statusShow = !nameShow;
       }
     console.log('matched is: ' + matched);
   });
@@ -173,8 +168,8 @@ Pebble.addEventListener("webviewclosed", function(e) {
   if (e.response.charAt(0) == "{" && e.response.slice(-1) == "}" && e.response.length > 5) {
     options = JSON.parse(decodeURIComponent(e.response));
     console.log("Options = " + JSON.stringify(options));
-    profileName = options["name"];
-    status = options["status"];
+    profileName = options.name;
+    status = options.status;
     ref.child('users/' + token + '/name/').set(profileName);
         ref.child('users/' + token + '/status/').set(profileName);
   } else {
